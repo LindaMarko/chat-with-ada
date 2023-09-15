@@ -1,5 +1,6 @@
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Image from "next/image";
+import { ReactMarkdown } from "react-markdown/lib/react-markdown";
 
 export const Message = ({ role, content }) => {
   const { user } = useUser();
@@ -32,7 +33,9 @@ export const Message = ({ role, content }) => {
           </div>
         )}
       </div>
-      <div className="prose prose-invert">{content}</div>
+      <div className="prose prose-invert">
+        <ReactMarkdown>{content}</ReactMarkdown>
+      </div>
     </div>
   );
 };
