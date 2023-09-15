@@ -6,4 +6,8 @@
     .btn {
         @apply rounded-md bg-indigo-500 px-4 py-2 text-white hover:bg-indigo-600 disabled:bg-indigo-300
     }
+
+    .side-menu-item {
+        @apply m-2 flex items-center gap-4 rounded-md p-2 hover:bg-gray-800;
+    }
 }
