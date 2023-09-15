@@ -1,6 +1,4 @@
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { faRobot } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 
 export const Message = ({ role, content }) => {
@@ -19,17 +17,17 @@ export const Message = ({ role, content }) => {
             width={30}
             height={30}
             alt="User avatar"
-            className="rounded-sm shadow-md shadow-black/50"
+            className="rounded-sm shadow shadow-black/50"
           />
         )}
         {role === "assistant" && (
-          <div className="flex items-center justify-center rounded-sm bg-gray-800 shadow-md shadow-black/50">
+          <div className="bg-gray-800">
             <Image
               src="/images/chatbot-small.png"
               width={30}
               height={30}
               alt="User avatar"
-              className="rounded-sm shadow-md shadow-black/50"
+              className="rounded-sm shadow shadow-black/50"
             />
           </div>
         )}
