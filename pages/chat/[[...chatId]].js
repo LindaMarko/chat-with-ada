@@ -1,3 +1,6 @@
+import { getSession } from "@auth0/nextjs-auth0";
+import clientPromise from "lib/mongodb";
+import { ObjectId } from "mongodb";
 import { ChatSidebar } from "components/ChatSidebar";
 import { Message } from "components/Message";
 import Head from "next/head";
@@ -6,13 +9,19 @@ import { streamReader } from "openai-edge-stream";
 import { useState, useEffect } from "react";
 import { v4 as uuid } from "uuid";
 
-export default function ChatPage() {
+export default function ChatPage({ chatId, title, messages = [] }) {
   const [newChatId, setNewChatId] = useState(null);
   const [incomingMessage, setIncomingMessage] = useState("");
   const [messageText, setMessageText] = useState("");
   const [newChatMessages, setNewChatMessages] = useState([]);
   const [generatingResponse, setGeneratingResponse] = useState(false);
   const router = useRouter();
+
+  // when our route changes
+  useEffect(() => {
+    setNewChatMessages([]);
+    setNewChatId(null);
+  }, [chatId]);
 
   // if we've created a new chat
   useEffect(() => {
@@ -60,19 +69,22 @@ export default function ChatPage() {
         content = content + message.content;
       }
     });
-
+    setIncomingMessage("");
     setGeneratingResponse(false);
   };
+
+  const allMessages = [...messages, ...newChatMessages];
+
   return (
     <>
       <Head>
         <title>New chat</title>
       </Head>
       <div className="grid h-screen grid-cols-[260px_1fr]">
-        <ChatSidebar />
+        <ChatSidebar chatId={chatId} />
         <div className="flex flex-col overflow-hidden bg-gray-700">
           <div className="flex-1 overflow-scroll text-white">
-            {newChatMessages.map((message) => (
+            {allMessages.map((message) => (
               <Message
                 key={message._id}
                 role={message.role}
@@ -103,3 +115,29 @@ export default function ChatPage() {
     </>
   );
 }
+
+export const getServerSideProps = async (ctx) => {
+  const chatId = ctx.params?.chatId?.[0] || null;
+  if (chatId) {
+    const { user } = await getSession(ctx.req, ctx.res);
+    const client = await clientPromise;
+    const db = client.db("ChatWithAda");
+    const chat = await db.collection("chats").findOne({
+      userId: user.sub,
+      _id: new ObjectId(chatId),
+    });
+    return {
+      props: {
+        chatId,
+        title: chat.title,
+        messages: chat.messages.map((message) => ({
+          ...message,
+          _id: uuid(),
+        })),
+      },
+    };
+  }
+  return {
+    props: {},
+  };
+};
