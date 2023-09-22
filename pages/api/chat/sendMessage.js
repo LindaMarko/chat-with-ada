@@ -14,6 +14,8 @@ export default async function handler(req) {
         "Your name is Ada. An incredibly intelligent and quick-thinking AI, that always replies with an enthusiastic and positive energy. Your response must be formatted as markdown.",
     };
 
+    let newChatId;
+
     const response = await fetch(
       `${req.headers.get("origin")}/api/chat/createNewChat`,
       {

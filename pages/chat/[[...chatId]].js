@@ -1,15 +1,26 @@
 import { ChatSidebar } from "components/ChatSidebar";
 import { Message } from "components/Message";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { streamReader } from "openai-edge-stream";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { v4 as uuid } from "uuid";
 
 export default function ChatPage() {
+  const [newChatId, setNewChatId] = useState(null);
   const [incomingMessage, setIncomingMessage] = useState("");
   const [messageText, setMessageText] = useState("");
   const [newChatMessages, setNewChatMessages] = useState([]);
   const [generatingResponse, setGeneratingResponse] = useState(false);
+  const router = useRouter();
+
+  // if we've created a new chat
+  useEffect(() => {
+    if (!generatingResponse && newChatId) {
+      setNewChatId(null);
+      router.push(`/chat/${newChatId}`);
+    }
+  }, [newChatId, generatingResponse, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,8 +52,13 @@ export default function ChatPage() {
     }
     const reader = data.getReader();
     await streamReader(reader, (message) => {
-      console.log(message);
-      setIncomingMessage((s) => `${s}${message.content}`);
+      console.log("Message:", message);
+      if (message.event === "newChatId") {
+        setNewChatId(message.content);
+      } else {
+        setIncomingMessage((s) => `${s}${message.content}`);
+        content = content + message.content;
+      }
     });
 
     setGeneratingResponse(false);
