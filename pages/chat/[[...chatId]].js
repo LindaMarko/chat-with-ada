@@ -4,6 +4,7 @@ import { ObjectId } from "mongodb";
 import { ChatSidebar } from "components/ChatSidebar";
 import { Message } from "components/Message";
 import Head from "next/head";
+import Image from "next/Image";
 import { useRouter } from "next/router";
 import { streamReader } from "openai-edge-stream";
 import { useState, useEffect } from "react";
@@ -99,24 +100,42 @@ export default function ChatPage({ chatId, title, messages = [] }) {
       <Head>
         <title>New chat</title>
       </Head>
-      <div className="grid h-screen grid-cols-[260px_1fr]">
+      <div className="grid h-screen grid-cols-1 md:grid-cols-[260px_1fr] ">
         <ChatSidebar chatId={chatId} />
-        <div className="flex flex-col overflow-hidden bg-gray-700">
+        <div className="-order-1 flex flex-col overflow-hidden bg-gray-700 md:order-1">
           <div className="flex flex-1 flex-col-reverse overflow-scroll text-white">
-            <div className="mb-auto">
-              {allMessages.map((message) => (
-                <Message
-                  key={message._id}
-                  role={message.role}
-                  content={message.content}
-                />
-              ))}
-              {!!incomingMessage && (
-                <Message role="assistant" content={incomingMessage} />
-              )}
-            </div>
+            {!allMessages.length && !incomingMessage && (
+              <div className="m-auto flex items-center justify-center text-center">
+                <div className="flex flex-col items-center justify-center">
+                  <Image
+                    src="/images/chatbot.png"
+                    width={170}
+                    height={170}
+                    alt="Chatbot"
+                    className="mb-2"
+                  />
+                  <h1 className="mt-2 text-4xl font-bold text-white/50">
+                    Ask me a question!
+                  </h1>
+                </div>
+              </div>
+            )}
+            {!!allMessages.length && (
+              <div className="mb-auto">
+                {allMessages.map((message) => (
+                  <Message
+                    key={message._id}
+                    role={message.role}
+                    content={message.content}
+                  />
+                ))}
+                {!!incomingMessage && (
+                  <Message role="assistant" content={incomingMessage} />
+                )}
+              </div>
+            )}
           </div>
-          <footer className="bg-gray-800 p-10">
+          <footer className="bg-gray-800 p-3 pb-5 pt-5 md:p-10">
             <form onSubmit={handleSubmit}>
               <fieldset className="flex gap-2" disabled={generatingResponse}>
                 <textarea
