@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb";
 import { ChatSidebar } from "components/ChatSidebar";
 import { Message } from "components/Message";
 import Head from "next/head";
-import Image from "next/Image";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { streamReader } from "openai-edge-stream";
 import { useState, useEffect } from "react";
